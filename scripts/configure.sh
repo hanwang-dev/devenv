@@ -65,8 +65,8 @@ set_default_shell_zsh() {
 
 configure() {
   log_info "=== Common Configuration ==="
+  link_dotfiles          # symlink first so git reads our gitconfig
   configure_git_identity
-  link_dotfiles
   install_vscode_extensions
   set_default_shell_zsh
   log_success "Configuration complete"
