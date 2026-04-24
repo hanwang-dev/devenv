@@ -1,0 +1,39 @@
+[core]
+	editor = code --wait
+	autocrlf = input
+	excludesfile = ~/.gitignore_global
+
+[push]
+	default = current
+	autoSetupRemote = true
+
+[pull]
+	rebase = false
+
+[init]
+	defaultBranch = main
+
+[fetch]
+	prune = true
+
+[diff]
+	tool = vscode
+
+[difftool "vscode"]
+	cmd = code --wait --diff $LOCAL $REMOTE
+
+[merge]
+	tool = vscode
+
+[mergetool "vscode"]
+	cmd = code --wait $MERGED
+
+[alias]
+	st  = status -sb
+	co  = checkout
+	br  = branch
+	sw  = switch
+	lg  = log --oneline --graph --decorate --all
+	ll  = log --oneline -20
+	undo = reset --soft HEAD~1
+	aliases = config --get-regexp alias

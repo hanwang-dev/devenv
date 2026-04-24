@@ -1,0 +1,20 @@
+# Python
+ms-python.python
+ms-python.black-formatter
+ms-python.isort
+ms-python.debugpy
+
+# Go
+golang.go
+
+# Git / GitHub
+eamodio.gitlens
+github.vscode-pull-request-github
+
+# Azure
+ms-azuretools.vscode-azurefunctions
+ms-azure-devops.azure-pipelines
+
+# General
+editorconfig.editorconfig
+streetsidesoftware.code-spell-checker
