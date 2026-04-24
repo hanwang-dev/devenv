@@ -45,12 +45,60 @@ cd devenv
 - **Shell** — symlinks `.zshrc` / `.bashrc` with PATH entries for pyenv, Go, and nvm; sets zsh as default (Unix)
 - **VS Code** — symlinks `configs/vscode/settings.json` and installs extensions from `configs/vscode/extensions.txt`
 
+## Upgrading
+
+### Run manually
+
+```bash
+# Unix
+bash upgrade.sh
+
+# Windows (Administrator PowerShell)
+.\upgrade.ps1
+```
+
+### Schedule automatic upgrades
+
+**Unix** — installs a cron job (default: every Monday at 09:00):
+
+```bash
+bash upgrade.sh --schedule
+# custom schedule (Mon + Thu at 09:00):
+bash upgrade.sh --schedule "0 9 * * 1,4"
+```
+
+Logs are written to `~/.devenv-upgrade.log`. To remove: `crontab -e` and delete the devenv lines.
+
+**Windows** — registers a Task Scheduler job:
+
+```powershell
+.\upgrade.ps1 -Schedule
+# custom day/time:
+.\upgrade.ps1 -Schedule -ScheduleDaysOfWeek "Monday,Thursday" -ScheduleTime "09:00"
+```
+
+Logs are written to `~\.devenv-upgrade.log`. To remove: `Unregister-ScheduledTask -TaskName devenv-auto-upgrade`.
+
+### What gets upgraded
+
+| Component | macOS | Ubuntu/Mint | Windows |
+|-----------|-------|-------------|---------|
+| System packages | `brew upgrade` | `apt upgrade` | `winget upgrade` |
+| Go | brew | latest tarball from go.dev | winget |
+| pyenv | `git pull` | `git pull` | `git pull` |
+| nvm + Node.js | latest nvm + LTS | latest nvm + LTS | — |
+| Codex CLI | `npm update -g` | `npm update -g` | `npm update -g` |
+| Claude Code | `npm update -g` | `npm update -g` | `npm update -g` |
+| Azure CLI | `az upgrade` | `az upgrade` | `az upgrade` |
+
 ## Structure
 
 ```
 devenv/
 ├── setup.sh                  # Unix entry point
 ├── setup.ps1                 # Windows entry point
+├── upgrade.sh                # Unix upgrade + cron scheduler
+├── upgrade.ps1               # Windows upgrade + Task Scheduler
 ├── scripts/
 │   ├── common.sh             # Shared utilities (logging, OS detection, symlink)
 │   ├── macos.sh              # macOS-specific installs
