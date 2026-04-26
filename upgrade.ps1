@@ -28,8 +28,21 @@ function Upgrade-WingetPackages {
     "Microsoft.WindowsTerminal"
   )
   foreach ($id in $ids) {
-    winget upgrade --id $id --silent --accept-source-agreements --accept-package-agreements 2>$null `
-      && Write-Ok "$id upgraded" || Write-Warn "$id — already up to date or not installed"
+    $before = (winget list --id $id 2>$null | Select-String $id | Select-Object -Last 1) -replace '\s+', ' '
+    winget upgrade --id $id --silent --accept-source-agreements --accept-package-agreements 2>$null
+    if ($LASTEXITCODE -eq 0) {
+      $after = (winget list --id $id 2>$null | Select-String $id | Select-Object -Last 1) -replace '\s+', ' '
+      # Extract version fields (4th column in winget list output)
+      $beforeVer = ($before -split ' ')[3]
+      $afterVer  = ($after  -split ' ')[3]
+      if ($beforeVer -and $afterVer -and $beforeVer -ne $afterVer) {
+        Write-Ok "$id upgraded ($beforeVer → $afterVer)"
+      } else {
+        Write-Ok "$id upgraded"
+      }
+    } else {
+      Write-Warn "$id — already up to date or not installed"
+    }
   }
 }
 

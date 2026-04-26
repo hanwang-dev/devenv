@@ -46,3 +46,6 @@ alias venv='python3 -m venv .venv && source .venv/bin/activate'
 alias gor='go run .'
 alias got='go test ./...'
 alias gob='go build ./...'
+
+
+PROMPT='%n@%m %1~ $ '
