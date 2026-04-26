@@ -16,6 +16,10 @@ Cross-platform dev environment setup for macOS, Ubuntu, Linux Mint, and Windows.
 | Claude Code | `@anthropic-ai/claude-code` via npm |
 | Azure CLI | `az` |
 | Terminal | iTerm2 (macOS) · Tilix (Ubuntu/Mint) · Windows Terminal |
+| zoxide | Frecency-based directory jumping — `z <dir>` instead of `cd` |
+| fzf | Fuzzy finder — Ctrl+R history, Ctrl+T files, Alt+C cd into subdir |
+| zsh-autosuggestions | Fish-style inline history completion (Unix) |
+| zsh-syntax-highlighting | Real-time command syntax highlighting (Unix) |
 
 ## Usage
 
@@ -42,7 +46,8 @@ cd devenv
 ## What gets configured
 
 - **Git** — prompts for name/email on first run; applies shared aliases and settings from `configs/git/.gitconfig`
-- **Shell** — symlinks `.zshrc` / `.bashrc` with PATH entries for pyenv, Go, and nvm; sets zsh as default (Unix)
+- **Shell** — symlinks `.zshrc` / `.bashrc` with PATH entries for pyenv, Go, and nvm; sets zsh as default (Unix); links `profile.ps1` as the PowerShell profile (Windows)
+- **CLI productivity** — zoxide for smart directory jumping, fzf for fuzzy search, zsh-autosuggestions + zsh-syntax-highlighting on Unix, PSReadLine history predictions + PSFzf keybindings on Windows
 - **VS Code** — symlinks `configs/vscode/settings.json` and installs extensions from `configs/vscode/extensions.txt`
 
 ## Upgrading
@@ -90,6 +95,8 @@ Logs are written to `~\.devenv-upgrade.log`. To remove: `Unregister-ScheduledTas
 | Codex CLI | `npm update -g` | `npm update -g` | `npm update -g` |
 | Claude Code | `npm update -g` | `npm update -g` | `npm update -g` |
 | Azure CLI | `az upgrade` | `az upgrade` | `az upgrade` |
+| zoxide | brew | — | winget |
+| fzf | brew | — | winget |
 
 ## Structure
 
@@ -106,8 +113,9 @@ devenv/
 │   └── configure.sh          # Common post-install configuration
 └── configs/
     ├── git/.gitconfig        # Git aliases and editor settings
-    ├── shell/.zshrc          # zsh config
+    ├── shell/.zshrc          # zsh config (macOS/Linux)
     ├── shell/.bashrc         # bash config
+    ├── shell/profile.ps1     # PowerShell profile (Windows)
     └── vscode/
         ├── settings.json     # Editor, Python, Go settings
         └── extensions.txt    # VS Code extensions list

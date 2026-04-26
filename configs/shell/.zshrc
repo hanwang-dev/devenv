@@ -49,3 +49,18 @@ alias gob='go build ./...'
 
 
 PROMPT='%n@%m %1~ $ '
+
+# zsh plugins (autosuggestions + syntax highlighting)
+_brew="$(brew --prefix 2>/dev/null)"
+for _plugin in zsh-autosuggestions/zsh-autosuggestions.zsh zsh-syntax-highlighting/zsh-syntax-highlighting.zsh; do
+  if   [ -f "$_brew/share/$_plugin" ]; then source "$_brew/share/$_plugin"
+  elif [ -f "$HOME/.zsh/$_plugin" ];   then source "$HOME/.zsh/$_plugin"
+  fi
+done
+unset _brew _plugin
+
+# zoxide — frecency-based directory jumping (z <dir>, zi for interactive fzf picker)
+command -v zoxide &>/dev/null && eval "$(zoxide init zsh)"
+
+# fzf — fuzzy finder: Ctrl+R history · Ctrl+T files · Alt+C cd into subdir
+command -v fzf &>/dev/null && eval "$(fzf --zsh)"

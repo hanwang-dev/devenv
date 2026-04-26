@@ -57,6 +57,7 @@ setup_ubuntu() {
     curl wget git zsh build-essential \
     libssl-dev libffi-dev zlib1g-dev \
     libbz2-dev libreadline-dev libsqlite3-dev \
+    fzf \
     tilix                                        # multi-tab terminal
 
   install_if_missing gh   "GitHub CLI" install_gh
@@ -72,6 +73,27 @@ setup_ubuntu() {
   fi
 
   install_if_missing go "Go" install_go
+
+  if ! command -v zoxide &>/dev/null; then
+    log_info "Installing zoxide..."
+    curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
+    log_success "zoxide installed"
+  else
+    log_success "zoxide already installed"
+  fi
+
+  for _plugin in zsh-autosuggestions zsh-syntax-highlighting; do
+    local _repo="https://github.com/zsh-users/${_plugin}"
+    [ "$_plugin" = "zsh-syntax-highlighting" ] && _repo="${_repo}.git"
+    if [ ! -d "$HOME/.zsh/$_plugin" ]; then
+      log_info "Installing $_plugin..."
+      git clone -q "$_repo" "$HOME/.zsh/$_plugin"
+      log_success "$_plugin installed"
+    else
+      log_success "$_plugin already installed"
+    fi
+  done
+  unset _plugin _repo
 
   if [ ! -d "$HOME/.nvm" ]; then
     log_info "Installing nvm + Node.js..."

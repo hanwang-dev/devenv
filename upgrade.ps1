@@ -25,7 +25,9 @@ function Upgrade-WingetPackages {
     "GoLang.Go",
     "OpenJS.NodeJS.LTS",
     "Microsoft.AzureCLI",
-    "Microsoft.WindowsTerminal"
+    "Microsoft.WindowsTerminal",
+    "ajeetdsouza.zoxide",
+    "junegunn.fzf"
   )
   foreach ($id in $ids) {
     $before = (winget list --id $id 2>$null | Select-String $id | Select-Object -Last 1) -replace '\s+', ' '

@@ -41,7 +41,9 @@ function Install-Packages {
     @{ Id = "GoLang.Go";                  Name = "Go" },
     @{ Id = "OpenJS.NodeJS.LTS";          Name = "Node.js LTS" },
     @{ Id = "Microsoft.AzureCLI";         Name = "Azure CLI" },
-    @{ Id = "Microsoft.WindowsTerminal";  Name = "Windows Terminal" }
+    @{ Id = "Microsoft.WindowsTerminal";  Name = "Windows Terminal" },
+    @{ Id = "ajeetdsouza.zoxide";         Name = "zoxide" },
+    @{ Id = "junegunn.fzf";              Name = "fzf" }
   )
 
   foreach ($pkg in $packages) {
@@ -66,6 +68,10 @@ function Install-Packages {
   Write-Info "Installing npm global tools..."
   npm install -g @openai/codex @anthropic-ai/claude-code
   Write-Ok "Codex CLI and Claude Code installed"
+
+  Write-Info "Installing PSFzf module..."
+  Install-Module -Name PSFzf -Force -Scope CurrentUser
+  Write-Ok "PSFzf installed"
 }
 
 function Configure-Git {
@@ -106,6 +112,19 @@ function Install-VSCodeExtensions {
   Write-Ok "VS Code extensions installed"
 }
 
+function Configure-PSProfile {
+  Write-Info "=== PowerShell Profile ==="
+  $profileDir = Split-Path $PROFILE
+  New-Item -ItemType Directory -Force -Path $profileDir | Out-Null
+  $src = Join-Path $ScriptDir "configs\shell\profile.ps1"
+  if (Test-Path $PROFILE) {
+    Move-Item $PROFILE "$PROFILE.bak" -Force
+    Write-Warn "Backed up existing PowerShell profile"
+  }
+  New-Item -ItemType SymbolicLink -Path $PROFILE -Target $src -Force | Out-Null
+  Write-Ok "PowerShell profile linked"
+}
+
 function Link-VSCodeSettings {
   $vscodeSrc = Join-Path $ScriptDir "configs\vscode\settings.json"
   $vscodeDir = "$env:APPDATA\Code\User"
@@ -124,6 +143,7 @@ Install-Packages
 Configure-Git
 Install-VSCodeExtensions
 Link-VSCodeSettings
+Configure-PSProfile
 
 Write-Host ""
 Write-Ok "Dev environment ready! Restart your terminal to apply PATH changes."

@@ -27,6 +27,10 @@ setup_macos() {
     node          # required for Codex CLI and Claude Code
     azure-cli
     zsh
+    zoxide
+    fzf
+    zsh-autosuggestions
+    zsh-syntax-highlighting
   )
   for pkg in "${brew_packages[@]}"; do
     if brew list "$pkg" &>/dev/null; then
