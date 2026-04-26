@@ -6,6 +6,9 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
+# Make tools installed by user-local installers discoverable during setup.
+export PATH="$HOME/.local/bin:$PATH"
+
 log_info()    { echo -e "${BLUE}[INFO]${NC}  $*"; }
 log_success() { echo -e "${GREEN}[OK]${NC}    $*"; }
 log_warn()    { echo -e "${YELLOW}[WARN]${NC}  $*"; }
