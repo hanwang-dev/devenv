@@ -16,8 +16,8 @@ function Test-Command {
 
 function Install-WingetPackage {
   param($Id, $Name)
-  $installed = winget list --id $Id 2>$null | Select-String $Id
-  if ($installed) {
+  winget list --id $Id --exact --accept-source-agreements | Out-Null
+  if ($LASTEXITCODE -eq 0) {
     Write-Ok "$Name already installed"
   } else {
     Write-Info "Installing $Name..."
