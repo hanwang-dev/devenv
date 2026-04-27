@@ -158,7 +158,8 @@ function Configure-WindowsTerminal {
   $settings = Get-Content $settingsPath -Raw | ConvertFrom-Json
   $font = [PSCustomObject]@{ face = "MesloLGM Nerd Font Mono" }
   $settings.profiles.defaults | Add-Member -NotePropertyName font -NotePropertyValue $font -Force
-  $settings | ConvertTo-Json -Depth 10 | Set-Content $settingsPath -Encoding UTF8
+  # Use WriteAllText to avoid the UTF-8 BOM that PS5.1 Set-Content adds
+  [System.IO.File]::WriteAllText($settingsPath, ($settings | ConvertTo-Json -Depth 10), [System.Text.UTF8Encoding]::new($false))
   Write-Ok "Windows Terminal font set to MesloLGM Nerd Font Mono"
 }
 
