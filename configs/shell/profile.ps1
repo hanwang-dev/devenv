@@ -1,17 +1,16 @@
-# Oh My Posh — p10k-style prompt theme
+# Oh My Posh — p10k-style prompt (default theme: jandedobbeleer)
 if (Get-Command oh-my-posh -ErrorAction SilentlyContinue) {
-  # Derive themes path from binary (winget installs: .../oh-my-posh/bin/oh-my-posh.exe)
-  $ompThemes = Join-Path (Split-Path (Split-Path (Get-Command oh-my-posh).Source)) "themes"
-  if (-not (Test-Path $ompThemes)) { $ompThemes = $env:POSH_THEMES_PATH }
-  oh-my-posh init pwsh --config "$ompThemes\jandedobbeleer.omp.json" | Invoke-Expression
+  oh-my-posh init pwsh | Invoke-Expression
 }
 
 # PSReadLine — fish-style history suggestions
 if (Get-Module -ListAvailable -Name PSReadLine) {
   $psrlVersion = (Get-Module -ListAvailable -Name PSReadLine | Sort-Object Version -Descending | Select-Object -First 1).Version
   if ($psrlVersion -ge [version]'2.1') {
-    Set-PSReadLineOption -PredictionSource History
-    Set-PSReadLineOption -PredictionViewStyle ListView
+    try {
+      Set-PSReadLineOption -PredictionSource History
+      Set-PSReadLineOption -PredictionViewStyle ListView
+    } catch {}
   }
   Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
 }
