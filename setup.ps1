@@ -70,6 +70,10 @@ function Install-Packages {
   npm install -g @openai/codex @anthropic-ai/claude-code
   Write-Ok "Codex CLI and Claude Code installed"
 
+  Write-Info "Installing PSReadLine (latest)..."
+  Install-Module -Name PSReadLine -Force -Scope CurrentUser -SkipPublisherCheck
+  Write-Ok "PSReadLine installed"
+
   Write-Info "Installing PSFzf module..."
   Install-Module -Name PSFzf -Force -Scope CurrentUser
   Write-Ok "PSFzf installed"
