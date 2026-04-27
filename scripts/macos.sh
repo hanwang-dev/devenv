@@ -60,12 +60,13 @@ setup_macos() {
     fi
   done
 
-  if ls ~/Library/Fonts/MesloLGM* &>/dev/null || ls /Library/Fonts/MesloLGM* &>/dev/null; then
-    log_success "MesloLGM Nerd Font already installed"
+  if brew list --cask font-sarasa-gothic &>/dev/null; then
+    log_success "Sarasa Mono SC already installed"
   else
-    log_info "Installing MesloLGM Nerd Font..."
-    oh-my-posh font install meslo
-    log_success "MesloLGM Nerd Font installed — set it as your iTerm2/terminal font"
+    log_info "Installing Sarasa Mono SC..."
+    brew tap homebrew/cask-fonts 2>/dev/null || true
+    brew install --cask font-sarasa-gothic
+    log_success "Sarasa Mono SC installed"
   fi
 
   log_info "Installing npm global tools..."

@@ -83,7 +83,8 @@ setup_ubuntu() {
   sudo apt install -y \
     curl wget git zsh build-essential \
     libssl-dev libffi-dev zlib1g-dev \
-    libbz2-dev libreadline-dev libsqlite3-dev
+    libbz2-dev libreadline-dev libsqlite3-dev \
+    p7zip-full
 
   install_if_missing gh      "GitHub CLI" install_gh
   install_if_missing code    "VS Code"    install_vscode
@@ -136,12 +137,21 @@ setup_ubuntu() {
   fi
   unset _theme
 
-  if fc-list | grep -qi "MesloLGM"; then
-    log_success "MesloLGM Nerd Font already installed"
+  if fc-list | grep -qi "Sarasa Mono SC"; then
+    log_success "Sarasa Mono SC already installed"
   else
-    log_info "Installing MesloLGM Nerd Font..."
-    oh-my-posh font install meslo
-    log_success "MesloLGM Nerd Font installed — set it as your terminal font"
+    log_info "Installing Sarasa Mono SC..."
+    local _sarasa_dir="$HOME/.local/share/fonts/SarasaMonoSC"
+    mkdir -p "$_sarasa_dir"
+    local _sarasa_ver
+    _sarasa_ver=$(curl -fsSL https://api.github.com/repos/be5invis/Sarasa-Gothic/releases/latest | grep '"tag_name"' | cut -d'"' -f4)
+    curl -fsSL "https://github.com/be5invis/Sarasa-Gothic/releases/download/${_sarasa_ver}/Sarasa-MonoSC-TTF-${_sarasa_ver#v}.7z" \
+      -o /tmp/sarasa.7z
+    7z e /tmp/sarasa.7z -o"$_sarasa_dir" '*.ttf' -r -y > /dev/null
+    rm /tmp/sarasa.7z
+    fc-cache -f "$_sarasa_dir"
+    unset _sarasa_dir _sarasa_ver
+    log_success "Sarasa Mono SC installed"
   fi
 
   for _plugin in zsh-autosuggestions zsh-syntax-highlighting; do

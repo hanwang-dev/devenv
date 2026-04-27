@@ -126,26 +126,33 @@ function Install-VSCodeExtensions {
   Write-Ok "VS Code extensions installed"
 }
 
-function Install-NerdFont {
-  Write-Info "=== Nerd Font ==="
-  # Refresh PATH so oh-my-posh is available immediately after winget install
-  $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" +
-              [System.Environment]::GetEnvironmentVariable("Path", "User")
-  if (-not (Test-Command oh-my-posh)) {
-    Write-Warn "oh-my-posh not in PATH yet — skipping font install (re-run setup after restarting terminal)"
-    return
-  }
+function Install-SarasaFont {
+  Write-Info "=== Sarasa Mono SC ==="
   $fontInstalled = (
-    (Get-ChildItem "$env:LOCALAPPDATA\Microsoft\Windows\Fonts" -Filter "MesloLGM*" -ErrorAction SilentlyContinue) -or
-    (Get-ChildItem "C:\Windows\Fonts" -Filter "MesloLGM*" -ErrorAction SilentlyContinue)
+    (Get-ChildItem "$env:LOCALAPPDATA\Microsoft\Windows\Fonts" -Filter "SarasaMonoSC*" -ErrorAction SilentlyContinue) -or
+    (Get-ChildItem "C:\Windows\Fonts" -Filter "SarasaMonoSC*" -ErrorAction SilentlyContinue)
   )
   if ($fontInstalled) {
-    Write-Ok "MesloLGM Nerd Font already installed"
-  } else {
-    Write-Info "Installing MesloLGM Nerd Font..."
-    oh-my-posh font install meslo
-    Write-Ok "MesloLGM Nerd Font installed"
+    Write-Ok "Sarasa Mono SC already installed"
+    return
   }
+  Write-Info "Downloading Sarasa Mono SC..."
+  $release = Invoke-RestMethod "https://api.github.com/repos/be5invis/Sarasa-Gothic/releases/latest"
+  $ver = $release.tag_name -replace '^v', ''
+  $url = "https://github.com/be5invis/Sarasa-Gothic/releases/download/v$ver/Sarasa-MonoSC-TTF-$ver.7z"
+  $tmp = "$env:TEMP\sarasa.7z"
+  Invoke-WebRequest -Uri $url -OutFile $tmp -UseBasicParsing
+  $fontDir = "$env:LOCALAPPDATA\Microsoft\Windows\Fonts"
+  New-Item -ItemType Directory -Force -Path $fontDir | Out-Null
+  & "${env:ProgramFiles}\7-Zip\7z.exe" e $tmp -o"$fontDir" "*.ttf" -r -y | Out-Null
+  Remove-Item $tmp
+  # Register fonts in the registry
+  $regPath = "HKCU:\Software\Microsoft\Windows NT\CurrentVersion\Fonts"
+  Get-ChildItem $fontDir -Filter "SarasaMonoSC*" | ForEach-Object {
+    $name = $_.BaseName + " (TrueType)"
+    Set-ItemProperty -Path $regPath -Name $name -Value $_.FullName
+  }
+  Write-Ok "Sarasa Mono SC installed"
 }
 
 function Configure-WindowsTerminal {
@@ -156,11 +163,11 @@ function Configure-WindowsTerminal {
     return
   }
   $settings = Get-Content $settingsPath -Raw | ConvertFrom-Json
-  $font = [PSCustomObject]@{ face = "MesloLGM Nerd Font Mono" }
+  $font = [PSCustomObject]@{ face = "Sarasa Mono SC" }
   $settings.profiles.defaults | Add-Member -NotePropertyName font -NotePropertyValue $font -Force
   # Use WriteAllText to avoid the UTF-8 BOM that PS5.1 Set-Content adds
   [System.IO.File]::WriteAllText($settingsPath, ($settings | ConvertTo-Json -Depth 10), [System.Text.UTF8Encoding]::new($false))
-  Write-Ok "Windows Terminal font set to MesloLGM Nerd Font Mono"
+  Write-Ok "Windows Terminal font set to Sarasa Mono SC"
 }
 
 function Configure-PSProfile {
@@ -191,7 +198,7 @@ function Link-VSCodeSettings {
 
 # Main
 Install-Packages
-Install-NerdFont
+Install-SarasaFont
 Configure-WindowsTerminal
 Configure-Git
 Install-VSCodeExtensions
