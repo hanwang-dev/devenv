@@ -60,13 +60,19 @@ setup_macos() {
     fi
   done
 
-  if brew list --cask font-sarasa-gothic &>/dev/null; then
-    log_success "Sarasa Mono SC already installed"
+  if ls ~/Library/Fonts/MapleMono-NF-CN-Regular.ttf &>/dev/null; then
+    log_success "Maple Mono NF CN already installed"
   else
-    log_info "Installing Sarasa Mono SC..."
-    brew tap homebrew/cask-fonts 2>/dev/null || true
-    brew install --cask font-sarasa-gothic
-    log_success "Sarasa Mono SC installed"
+    log_info "Installing Maple Mono NF CN..."
+    local _maple_ver
+    _maple_ver=$(curl -fsSL https://api.github.com/repos/subframe7536/maple-font/releases/latest | grep '"tag_name"' | cut -d'"' -f4)
+    curl -fsSL "https://github.com/subframe7536/maple-font/releases/download/${_maple_ver}/MapleMono-NF-CN.zip" \
+      -o /tmp/maple-nf-cn.zip
+    unzip -q /tmp/maple-nf-cn.zip -d /tmp/maple-nf-cn
+    cp /tmp/maple-nf-cn/*.ttf ~/Library/Fonts/
+    rm -rf /tmp/maple-nf-cn /tmp/maple-nf-cn.zip
+    unset _maple_ver
+    log_success "Maple Mono NF CN installed"
   fi
 
   log_info "Installing npm global tools..."
