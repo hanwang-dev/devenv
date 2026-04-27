@@ -51,7 +51,8 @@ alias got='go test ./...'
 alias gob='go build ./...'
 
 
-PROMPT='%n@%m %1~ $ '
+# Oh My Posh — p10k-style prompt theme
+command -v oh-my-posh &>/dev/null && eval "$(oh-my-posh init zsh --config "$POSH_THEMES_PATH/jandedobbeleer.omp.json")"
 
 # zsh plugins (autosuggestions + syntax highlighting)
 _brew="$(brew --prefix 2>/dev/null)"

@@ -31,6 +31,7 @@ setup_macos() {
     fzf
     zsh-autosuggestions
     zsh-syntax-highlighting
+    jandedobbeleer/oh-my-posh/oh-my-posh
   )
   for pkg in "${brew_packages[@]}"; do
     if brew list "$pkg" &>/dev/null; then
@@ -56,6 +57,14 @@ setup_macos() {
       log_success "$cask installed"
     fi
   done
+
+  if ls ~/Library/Fonts/MesloLGM* &>/dev/null || ls /Library/Fonts/MesloLGM* &>/dev/null; then
+    log_success "MesloLGM Nerd Font already installed"
+  else
+    log_info "Installing MesloLGM Nerd Font..."
+    oh-my-posh font install meslo
+    log_success "MesloLGM Nerd Font installed — set it as your iTerm2/terminal font"
+  fi
 
   log_info "Installing npm global tools..."
   local npm_packages=(

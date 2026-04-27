@@ -43,7 +43,8 @@ function Install-Packages {
     @{ Id = "Microsoft.AzureCLI";         Name = "Azure CLI" },
     @{ Id = "Microsoft.WindowsTerminal";  Name = "Windows Terminal" },
     @{ Id = "ajeetdsouza.zoxide";         Name = "zoxide" },
-    @{ Id = "junegunn.fzf";              Name = "fzf" }
+    @{ Id = "junegunn.fzf";              Name = "fzf" },
+    @{ Id = "JanDeDobbeleer.OhMyPosh";  Name = "Oh My Posh" }
   )
 
   foreach ($pkg in $packages) {
@@ -112,6 +113,42 @@ function Install-VSCodeExtensions {
   Write-Ok "VS Code extensions installed"
 }
 
+function Install-NerdFont {
+  Write-Info "=== Nerd Font ==="
+  # Refresh PATH so oh-my-posh is available immediately after winget install
+  $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" +
+              [System.Environment]::GetEnvironmentVariable("Path", "User")
+  if (-not (Test-Command oh-my-posh)) {
+    Write-Warn "oh-my-posh not in PATH yet — skipping font install (re-run setup after restarting terminal)"
+    return
+  }
+  $fontInstalled = (
+    (Get-ChildItem "$env:LOCALAPPDATA\Microsoft\Windows\Fonts" -Filter "MesloLGM*" -ErrorAction SilentlyContinue) -or
+    (Get-ChildItem "C:\Windows\Fonts" -Filter "MesloLGM*" -ErrorAction SilentlyContinue)
+  )
+  if ($fontInstalled) {
+    Write-Ok "MesloLGM Nerd Font already installed"
+  } else {
+    Write-Info "Installing MesloLGM Nerd Font..."
+    oh-my-posh font install meslo
+    Write-Ok "MesloLGM Nerd Font installed"
+  }
+}
+
+function Configure-WindowsTerminal {
+  Write-Info "=== Windows Terminal font ==="
+  $settingsPath = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
+  if (-not (Test-Path $settingsPath)) {
+    Write-Warn "Windows Terminal settings.json not found — skipping font config"
+    return
+  }
+  $settings = Get-Content $settingsPath -Raw | ConvertFrom-Json
+  $font = [PSCustomObject]@{ face = "MesloLGM Nerd Font Mono" }
+  $settings.profiles.defaults | Add-Member -NotePropertyName font -NotePropertyValue $font -Force
+  $settings | ConvertTo-Json -Depth 10 | Set-Content $settingsPath -Encoding UTF8
+  Write-Ok "Windows Terminal font set to MesloLGM Nerd Font Mono"
+}
+
 function Configure-PSProfile {
   Write-Info "=== PowerShell Profile ==="
   $profileDir = Split-Path $PROFILE
@@ -140,6 +177,8 @@ function Link-VSCodeSettings {
 
 # Main
 Install-Packages
+Install-NerdFont
+Configure-WindowsTerminal
 Configure-Git
 Install-VSCodeExtensions
 Link-VSCodeSettings

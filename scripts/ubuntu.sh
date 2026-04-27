@@ -82,6 +82,22 @@ setup_ubuntu() {
     log_success "zoxide already installed"
   fi
 
+  if ! command -v oh-my-posh &>/dev/null; then
+    log_info "Installing Oh My Posh..."
+    curl -s https://ohmyposh.dev/install.sh | bash -s -- -d ~/.local/bin
+    log_success "Oh My Posh installed"
+  else
+    log_success "Oh My Posh already installed"
+  fi
+
+  if fc-list | grep -qi "MesloLGM"; then
+    log_success "MesloLGM Nerd Font already installed"
+  else
+    log_info "Installing MesloLGM Nerd Font..."
+    oh-my-posh font install meslo
+    log_success "MesloLGM Nerd Font installed — set it as your terminal font"
+  fi
+
   for _plugin in zsh-autosuggestions zsh-syntax-highlighting; do
     local _repo="https://github.com/zsh-users/${_plugin}"
     [ "$_plugin" = "zsh-syntax-highlighting" ] && _repo="${_repo}.git"
