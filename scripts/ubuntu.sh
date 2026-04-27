@@ -30,8 +30,11 @@ install_pyenv() {
 install_nvm() {
   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
   export NVM_DIR="$HOME/.nvm"
+  # nvm uses unbound variables internally — disable -u while sourcing
+  set +u
   # shellcheck source=/dev/null
   [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
+  set -u
 }
 
 install_vscode() {
@@ -114,13 +117,17 @@ setup_ubuntu() {
   if [ ! -d "$HOME/.nvm" ]; then
     log_info "Installing nvm + Node.js..."
     install_nvm
+    set +u
     nvm install --lts
     nvm use --lts
+    set -u
     log_success "nvm + Node.js installed"
   else
     log_success "nvm already installed"
     export NVM_DIR="$HOME/.nvm"
+    set +u
     [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
+    set -u
   fi
 
   log_info "Installing npm global tools..."

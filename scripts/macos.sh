@@ -8,8 +8,10 @@ install_homebrew() {
 install_nvm() {
   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
   export NVM_DIR="$HOME/.nvm"
+  set +u
   # shellcheck source=/dev/null
   [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
+  set -u
 }
 
 setup_macos() {
