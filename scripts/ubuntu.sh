@@ -124,11 +124,11 @@ setup_ubuntu() {
     log_success "Oh My Posh already installed"
   fi
 
-  local _theme="$HOME/.cache/oh-my-posh/themes/clean-detailed.omp.json"
+  local _theme="$HOME/.cache/oh-my-posh/themes/slim.omp.json"
   if [ ! -f "$_theme" ]; then
     log_info "Downloading Oh My Posh theme..."
     mkdir -p "$(dirname "$_theme")"
-    curl -fsSL "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/clean-detailed.omp.json" \
+    curl -fsSL "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/slim.omp.json" \
       -o "$_theme"
     log_success "Theme downloaded"
   else
