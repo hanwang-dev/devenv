@@ -51,6 +51,30 @@ install_azure_cli() {
   curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 }
 
+install_wezterm() {
+  curl -fsSL https://apt.fury.io/wez/gpg.key \
+    | sudo gpg --yes --dearmor -o /usr/share/keyrings/wezterm-fury.gpg
+  echo 'deb [signed-by=/usr/share/keyrings/wezterm-fury.gpg] https://apt.fury.io/wez/ * *' \
+    | sudo tee /etc/apt/sources.list.d/wezterm.list > /dev/null
+  sudo apt update -q
+  sudo apt install -y wezterm
+}
+
+install_fzf() {
+  local arch
+  case "$(dpkg --print-architecture)" in
+    amd64) arch="amd64" ;;
+    arm64) arch="arm64" ;;
+    *)     arch="$(dpkg --print-architecture)" ;;
+  esac
+  local version
+  version="$(curl -fsSL https://api.github.com/repos/junegunn/fzf/releases/latest \
+    | grep -o '"tag_name": *"[^"]*"' | grep -o '[0-9][^"]*')"
+  mkdir -p ~/.local/bin
+  curl -fsSL "https://github.com/junegunn/fzf/releases/download/v${version}/fzf-${version}-linux_${arch}.tar.gz" \
+    | tar -xz -C ~/.local/bin fzf
+}
+
 setup_ubuntu() {
   log_info "=== Ubuntu / Linux Mint Setup ==="
 
@@ -59,13 +83,20 @@ setup_ubuntu() {
   sudo apt install -y \
     curl wget git zsh build-essential \
     libssl-dev libffi-dev zlib1g-dev \
-    libbz2-dev libreadline-dev libsqlite3-dev \
-    fzf \
-    tilix                                        # multi-tab terminal
+    libbz2-dev libreadline-dev libsqlite3-dev
 
-  install_if_missing gh   "GitHub CLI" install_gh
-  install_if_missing code "VS Code"    install_vscode
-  install_if_missing az   "Azure CLI"  install_azure_cli
+  install_if_missing gh      "GitHub CLI" install_gh
+  install_if_missing code    "VS Code"    install_vscode
+  install_if_missing az      "Azure CLI"  install_azure_cli
+  install_if_missing wezterm "WezTerm"    install_wezterm
+
+  if ! fzf --zsh &>/dev/null 2>&1; then
+    log_info "Installing fzf from GitHub (requires --zsh support)..."
+    install_fzf
+    log_success "fzf installed"
+  else
+    log_success "fzf already installed ($(fzf --version | awk '{print $1}'))"
+  fi
 
   if [ ! -d "$HOME/.pyenv" ]; then
     log_info "Installing pyenv..."
@@ -92,6 +123,18 @@ setup_ubuntu() {
   else
     log_success "Oh My Posh already installed"
   fi
+
+  local _theme="$HOME/.cache/oh-my-posh/themes/clean-detailed.omp.json"
+  if [ ! -f "$_theme" ]; then
+    log_info "Downloading Oh My Posh theme..."
+    mkdir -p "$(dirname "$_theme")"
+    curl -fsSL "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/clean-detailed.omp.json" \
+      -o "$_theme"
+    log_success "Theme downloaded"
+  else
+    log_success "Oh My Posh theme already present"
+  fi
+  unset _theme
 
   if fc-list | grep -qi "MesloLGM"; then
     log_success "MesloLGM Nerd Font already installed"
@@ -130,9 +173,18 @@ setup_ubuntu() {
     set -u
   fi
 
-  log_info "Installing npm global tools..."
-  npm install -g @openai/codex @anthropic-ai/claude-code
-  log_success "Codex CLI and Claude Code installed"
+  for _pkg in "@openai/codex" "@anthropic-ai/claude-code"; do
+    local _cmd
+    _cmd="$(basename "$_pkg")"
+    if ! command -v "$_cmd" &>/dev/null; then
+      log_info "Installing $_pkg..."
+      npm install -g "$_pkg"
+      log_success "$_pkg installed"
+    else
+      log_success "$_pkg already installed"
+    fi
+  done
+  unset _pkg _cmd
 
   log_success "Ubuntu/Mint setup complete"
 }

@@ -28,6 +28,9 @@ link_dotfiles() {
 
   symlink_config "$config_dir/git/.gitconfig"   "$HOME/.gitconfig"
 
+  mkdir -p "$HOME/.config/wezterm"
+  symlink_config "$config_dir/wezterm/wezterm.lua" "$HOME/.config/wezterm/wezterm.lua"
+
   if [ "$SHELL" = "$(command -v zsh)" ] || command_exists zsh; then
     symlink_config "$config_dir/shell/.zshrc"   "$HOME/.zshrc"
   fi
