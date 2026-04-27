@@ -70,13 +70,22 @@ function Install-Packages {
   npm install -g @openai/codex @anthropic-ai/claude-code
   Write-Ok "Codex CLI and Claude Code installed"
 
-  Write-Info "Installing PSReadLine (latest)..."
-  Install-Module -Name PSReadLine -Force -Scope CurrentUser -SkipPublisherCheck
-  Write-Ok "PSReadLine installed"
+  $psrl = Get-Module -ListAvailable PSReadLine | Sort-Object Version -Descending | Select-Object -First 1
+  if (-not $psrl -or $psrl.Version -lt [version]'2.1') {
+    Write-Info "Installing PSReadLine (latest)..."
+    Install-Module -Name PSReadLine -Force -Scope CurrentUser -SkipPublisherCheck
+    Write-Ok "PSReadLine installed"
+  } else {
+    Write-Ok "PSReadLine $($psrl.Version) already installed"
+  }
 
-  Write-Info "Installing PSFzf module..."
-  Install-Module -Name PSFzf -Force -Scope CurrentUser
-  Write-Ok "PSFzf installed"
+  if (-not (Get-Module -ListAvailable PSFzf)) {
+    Write-Info "Installing PSFzf module..."
+    Install-Module -Name PSFzf -Scope CurrentUser
+    Write-Ok "PSFzf installed"
+  } else {
+    Write-Ok "PSFzf already installed"
+  }
 }
 
 function Configure-Git {
