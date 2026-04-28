@@ -66,12 +66,39 @@ set_default_shell_zsh() {
   fi
 }
 
+configure_claude_statusline() {
+  local script_src="$DEVENV_DIR/configs/claude/statusline.py"
+  local script_dst="$HOME/.claude/statusline.py"
+
+  mkdir -p "$HOME/.claude"
+  chmod +x "$script_src"
+  symlink_config "$script_src" "$script_dst"
+
+  SETTINGS_PATH="$HOME/.claude/settings.json" python3 - <<'PYEOF'
+import json, os
+
+path = os.environ['SETTINGS_PATH']
+cfg  = {}
+if os.path.exists(path):
+    with open(path) as f:
+        try:    cfg = json.load(f)
+        except: pass
+
+cfg['statusLine'] = {'type': 'command', 'command': '~/.claude/statusline.py'}
+
+with open(path, 'w') as f:
+    json.dump(cfg, f, indent=2)
+PYEOF
+  log_success "Claude Code status line configured"
+}
+
 configure() {
   log_info "=== Common Configuration ==="
   link_dotfiles          # symlink first so git reads our gitconfig
   configure_git_identity
   install_vscode_extensions
   set_default_shell_zsh
+  configure_claude_statusline
   log_success "Configuration complete"
 }
 

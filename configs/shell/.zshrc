@@ -52,7 +52,7 @@ alias gob='go build ./...'
 
 
 # Oh My Posh — p10k-style prompt theme
-command -v oh-my-posh &>/dev/null && eval "$(oh-my-posh init zsh --config "${POSH_THEMES_PATH:-$HOME/.cache/oh-my-posh/themes}/iterm2.omp.json")"
+command -v oh-my-posh &>/dev/null && eval "$(oh-my-posh init zsh --config "${POSH_THEMES_PATH:-$HOME/.cache/oh-my-posh/themes}/clean-detailed.omp.json")"
 
 # zsh plugins (autosuggestions + syntax highlighting)
 _brew="$(brew --prefix 2>/dev/null)"

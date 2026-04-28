@@ -1,6 +1,7 @@
-# Oh My Posh — p10k-style prompt (default theme: jandedobbeleer)
+# Oh My Posh — iterm2 theme (matches Linux/zsh config)
 if (Get-Command oh-my-posh -ErrorAction SilentlyContinue) {
-  oh-my-posh init pwsh | Invoke-Expression
+  $poshThemes = if ($env:POSH_THEMES_PATH) { $env:POSH_THEMES_PATH } else { "$env:USERPROFILE\.cache\oh-my-posh\themes" }
+  oh-my-posh init pwsh --config "$poshThemes\clean-detailed.omp.json" | Invoke-Expression
 }
 
 # PSReadLine — fish-style history suggestions

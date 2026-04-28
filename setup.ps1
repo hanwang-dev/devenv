@@ -170,6 +170,20 @@ function Configure-WindowsTerminal {
   Write-Ok "Windows Terminal font set to Sarasa Mono SC"
 }
 
+function Install-OhMyPoshTheme {
+  Write-Info "=== Oh My Posh Theme ==="
+  $themesDir = "$env:USERPROFILE\.cache\oh-my-posh\themes"
+  New-Item -ItemType Directory -Force -Path $themesDir | Out-Null
+  $themeFile = "$themesDir\clean-detailed.omp.json"
+  if (Test-Path $themeFile) {
+    Write-Ok "clean-detailed theme already present"
+    return
+  }
+  $url = "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/clean-detailed.omp.json"
+  Invoke-WebRequest -Uri $url -OutFile $themeFile -UseBasicParsing
+  Write-Ok "clean-detailed theme downloaded to $themesDir"
+}
+
 function Configure-PSProfile {
   Write-Info "=== PowerShell Profile ==="
   $profileDir = Split-Path $PROFILE
@@ -203,6 +217,7 @@ Configure-WindowsTerminal
 Configure-Git
 Install-VSCodeExtensions
 Link-VSCodeSettings
+Install-OhMyPoshTheme
 Configure-PSProfile
 
 Write-Host ""
