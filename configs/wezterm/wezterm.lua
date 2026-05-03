@@ -6,6 +6,7 @@ config.font_size = 11.0
 config.color_scheme = 'Tokyo Night'
 
 config.window_padding = { left = 8, right = 8, top = 8, bottom = 8 }
+config.window_decorations = "NONE"
 config.hide_tab_bar_if_only_one_tab = false
 config.window_close_confirmation = 'NeverPrompt'
 
