@@ -1,6 +1,7 @@
 #Requires -Version 5.1
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 
@@ -126,33 +127,40 @@ function Install-VSCodeExtensions {
   Write-Ok "VS Code extensions installed"
 }
 
-function Install-SarasaFont {
-  Write-Info "=== Sarasa Mono SC ==="
+function Install-MapleMono {
+  Write-Info "=== Maple Mono NF CN ==="
   $fontInstalled = (
-    (Get-ChildItem "$env:LOCALAPPDATA\Microsoft\Windows\Fonts" -Filter "SarasaMonoSC*" -ErrorAction SilentlyContinue) -or
-    (Get-ChildItem "C:\Windows\Fonts" -Filter "SarasaMonoSC*" -ErrorAction SilentlyContinue)
+    (Get-ChildItem "$env:LOCALAPPDATA\Microsoft\Windows\Fonts" -Filter "MapleMono-NF-CN*" -ErrorAction SilentlyContinue) -or
+    (Get-ChildItem "C:\Windows\Fonts" -Filter "MapleMono-NF-CN*" -ErrorAction SilentlyContinue)
   )
   if ($fontInstalled) {
-    Write-Ok "Sarasa Mono SC already installed"
+    Write-Ok "Maple Mono NF CN already installed"
     return
   }
-  Write-Info "Downloading Sarasa Mono SC..."
-  $release = Invoke-RestMethod "https://api.github.com/repos/be5invis/Sarasa-Gothic/releases/latest"
-  $ver = $release.tag_name -replace '^v', ''
-  $url = "https://github.com/be5invis/Sarasa-Gothic/releases/download/v$ver/Sarasa-MonoSC-TTF-$ver.7z"
-  $tmp = "$env:TEMP\sarasa.7z"
-  Invoke-WebRequest -Uri $url -OutFile $tmp -UseBasicParsing
+  Write-Info "Downloading Maple Mono NF CN..."
+  $release = Invoke-RestMethod "https://api.github.com/repos/subframe7536/maple-font/releases/latest"
+  $asset = $release.assets | Where-Object { $_.name -eq "MapleMono-NF-CN.zip" } | Select-Object -First 1
+  if (-not $asset) {
+    Write-Err "Could not find MapleMono-NF-CN.zip in latest release"
+    return
+  }
+  $tmp = "$env:TEMP\MapleMono-NF-CN.zip"
+  curl.exe -L -o $tmp $asset.browser_download_url
   $fontDir = "$env:LOCALAPPDATA\Microsoft\Windows\Fonts"
   New-Item -ItemType Directory -Force -Path $fontDir | Out-Null
-  & "${env:ProgramFiles}\7-Zip\7z.exe" e $tmp -o"$fontDir" "*.ttf" -r -y | Out-Null
+  Expand-Archive -Path $tmp -DestinationPath "$env:TEMP\MapleMono" -Force
+  Get-ChildItem "$env:TEMP\MapleMono" -Filter "*.ttf" -Recurse | ForEach-Object {
+    Copy-Item $_.FullName -Destination $fontDir -Force
+  }
   Remove-Item $tmp
+  Remove-Item "$env:TEMP\MapleMono" -Recurse -Force
   # Register fonts in the registry
   $regPath = "HKCU:\Software\Microsoft\Windows NT\CurrentVersion\Fonts"
-  Get-ChildItem $fontDir -Filter "SarasaMonoSC*" | ForEach-Object {
+  Get-ChildItem $fontDir -Filter "MapleMono-NF-CN*" | ForEach-Object {
     $name = $_.BaseName + " (TrueType)"
     Set-ItemProperty -Path $regPath -Name $name -Value $_.FullName
   }
-  Write-Ok "Sarasa Mono SC installed"
+  Write-Ok "Maple Mono NF CN installed"
 }
 
 function Configure-WindowsTerminal {
@@ -163,11 +171,11 @@ function Configure-WindowsTerminal {
     return
   }
   $settings = Get-Content $settingsPath -Raw | ConvertFrom-Json
-  $font = [PSCustomObject]@{ face = "Sarasa Mono SC" }
+  $font = [PSCustomObject]@{ face = "Maple Mono NF CN" }
   $settings.profiles.defaults | Add-Member -NotePropertyName font -NotePropertyValue $font -Force
   # Use WriteAllText to avoid the UTF-8 BOM that PS5.1 Set-Content adds
   [System.IO.File]::WriteAllText($settingsPath, ($settings | ConvertTo-Json -Depth 10), [System.Text.UTF8Encoding]::new($false))
-  Write-Ok "Windows Terminal font set to Sarasa Mono SC"
+  Write-Ok "Windows Terminal font set to Maple Mono NF CN"
 }
 
 function Install-OhMyPoshTheme {
@@ -212,7 +220,7 @@ function Link-VSCodeSettings {
 
 # Main
 Install-Packages
-Install-SarasaFont
+Install-MapleMono
 Configure-WindowsTerminal
 Configure-Git
 Install-VSCodeExtensions
